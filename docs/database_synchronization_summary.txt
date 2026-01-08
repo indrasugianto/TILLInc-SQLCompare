@@ -1,0 +1,297 @@
+================================================================================
+DATABASE SYNCHRONIZATION SUMMARY
+TILLDB to TILLDBWeb_Prod
+================================================================================
+
+This document consolidates all analysis and changes for synchronizing database
+structures between TILLDB and TILLDBWeb_Prod databases.
+
+Database: TILLDBWeb_Prod
+Schema: dbo
+Date: Generated during database comparison project
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+1. Affected Tables and New Fields
+2. New Tables Analysis
+3. catMassHealthServiceLevels Implementation
+4. Complete List of Tables Not in TILLDBWeb_Prod
+
+================================================================================
+1. AFFECTED TABLES AND NEW FIELDS
+================================================================================
+
+This section lists all tables that have new fields added from TILLDB, along
+with the field names and their data types.
+
+TABLE OF AFFECTED TABLES AND FIELDS
+================================================================================
+
+Table Name                          | Field Name                  | Data Type
+------------------------------------|-----------------------------|------------------
+catStaffEmailAddresses             | CityTown                    | NVARCHAR(50)
+catStaffEmailAddresses             | Location                    | NVARCHAR(80)
+tblPeopleClientsDayServices        | LevelUpdatedWhen            | NVARCHAR(10)
+tblPeopleClientsDayServices        | LevelUpdatedWho             | NVARCHAR(30)
+tblPeopleClientsDayServices        | MassHealthServiceLevel      | NVARCHAR(25)
+tblPeopleDayAttendance             | MassHealthServiceLevel      | NVARCHAR(25)
+tblPeopleScheduledStaffChanges     | AddMidInitial               | NVARCHAR(1)
+tblPeopleScheduledStaffChanges     | CurrentMidinitial           | NVARCHAR(1)
+tblPeopleScheduledStaffChanges     | DeleteMidInitial            | NVARCHAR(1)
+tblPeopleScheduledStaffChanges     | NewMidInitial               | NVARCHAR(1)
+
+SUMMARY
+================================================================================
+
+Total Tables Affected: 4
+Total New Fields: 10
+
+Breakdown by Table:
+  - catStaffEmailAddresses:         2 fields
+  - tblPeopleClientsDayServices:    3 fields
+  - tblPeopleDayAttendance:         1 field
+  - tblPeopleScheduledStaffChanges: 4 fields
+
+Breakdown by Stored Procedure:
+  - spApp_DataImportFromTILLDB_Cat:     1 table, 2 fields
+  - spApp_DataImportFromTILLDB_People:  3 tables, 8 fields
+
+NOTES
+================================================================================
+
+- All fields are nullable (NULL allowed)
+- Field Name Note: CurrentMidinitial uses "Midinitial" spelling (not "MidInitial")
+
+================================================================================
+2. NEW TABLES ANALYSIS
+================================================================================
+
+TABLES IN TILLDB THAT DON'T EXIST IN TILLDBWeb_Prod
+================================================================================
+
+Total Tables Found: 34
+
+CATEGORY BREAKDOWN
+================================================================================
+
+1. DELETED/ARCHIVE TABLES (28 tables)
+   These are archive tables for deleted records. Typically not needed in 
+   TILLDBWeb_Prod as they contain historical/deleted data only.
+   
+   - tblDELETEDContracts
+   - tblDELETEDContractsAmendments
+   - tblDELETEDContractsBillingBook
+   - tblDELETEDLocations
+   - tblDELETEDLocationsContacts
+   - tblDELETEDPeople
+   - tblDELETEDPeopleClientsAdultCoaching
+   - tblDELETEDPeopleClientsAdultCompanion
+   - tblDELETEDPeopleClientsAutismServices
+   - tblDELETEDPeopleClientsCLOServices
+   - tblDELETEDPeopleClientsCommunityConnectionsServices
+   - tblDELETEDPeopleClientsDayServices
+   - tblDELETEDPeopleClientsDemographics
+   - tblDELETEDPeopleClientsIndividualSupportServices
+   - tblDELETEDPeopleClientsNHDay
+   - tblDELETEDPeopleClientsNHRes
+   - tblDELETEDPeopleClientsPCAServices
+   - tblDELETEDPeopleClientsPCAServicesContactNotes
+   - tblDELETEDPeopleClientsResidentialServices
+   - tblDELETEDPeopleClientsSharedLivingServices
+   - tblDELETEDPeopleClientsSpringboardServices
+   - tblDELETEDPeopleClientsTRASEServices
+   - tblDELETEDPeopleClientsTransportationServices
+   - tblDELETEDPeopleClientsVendors
+   - tblDELETEDPeopleClientsVocationalServices
+   - tblDELETEDPeopleConsultants
+   - tblDELETEDPeopleDonors
+   - tblDELETEDPeopleFamily
+
+2. TEMPORARY TABLES (2 tables)
+   These are temporary tables and should NOT be added to TILLDBWeb_Prod.
+   
+   - ~TMPCLP306311
+   - ~TMPCLP467621
+
+3. BACKUP TABLES (1 table)
+   Backup table - typically not needed in production web database.
+   
+   - tblPeopleStaffSupervisorsBkup
+
+4. POTENTIALLY IMPORTANT TABLES (3 tables)
+   These tables may need to be added to TILLDBWeb_Prod:
+   
+   ⚠️  catMassHealthServiceLevels
+      - IMPORTANT: This is a lookup/reference table
+      - Since we're adding MassHealthServiceLevel fields to multiple tables,
+        this lookup table may be needed for data integrity and validation
+      - RECOMMENDATION: Review and consider adding this table
+      - STATUS: ✅ IMPLEMENTED (see section 3)
+   
+   - OLE DB Destination
+      - Appears to be an SSIS/system table
+      - May not be needed in web database
+      - RECOMMENDATION: Review if this is needed
+   
+   - tblDedhamHQLocations
+      - Could be a reference/lookup table
+      - RECOMMENDATION: Review if this is needed for the web application
+
+RECOMMENDATIONS
+================================================================================
+
+HIGH PRIORITY TO REVIEW:
+  ✓ catMassHealthServiceLevels
+    - This lookup table is likely needed since MassHealthServiceLevel fields
+      are being added to tblPeopleClientsDayServices and tblPeopleDayAttendance
+    - STATUS: ✅ IMPLEMENTED (see section 3)
+
+LOW PRIORITY / LIKELY NOT NEEDED:
+  - All DELETED tables (archive tables)
+  - Temporary tables (~TMPCLP*)
+  - Backup tables (tblPeopleStaffSupervisorsBkup)
+  - OLE DB Destination (SSIS/system table)
+
+TO INVESTIGATE:
+  - tblDedhamHQLocations (determine if this is needed for web application)
+
+COMPLETE LIST OF ALL TABLES NOT IN TILLDBWeb_Prod
+================================================================================
+
+OLE DB Destination
+catMassHealthServiceLevels ✅ (IMPLEMENTED)
+tblDELETEDContracts
+tblDELETEDContractsAmendments
+tblDELETEDContractsBillingBook
+tblDELETEDLocations
+tblDELETEDLocationsContacts
+tblDELETEDPeople
+tblDELETEDPeopleClientsAdultCoaching
+tblDELETEDPeopleClientsAdultCompanion
+tblDELETEDPeopleClientsAutismServices
+tblDELETEDPeopleClientsCLOServices
+tblDELETEDPeopleClientsCommunityConnectionsServices
+tblDELETEDPeopleClientsDayServices
+tblDELETEDPeopleClientsDemographics
+tblDELETEDPeopleClientsIndividualSupportServices
+tblDELETEDPeopleClientsNHDay
+tblDELETEDPeopleClientsNHRes
+tblDELETEDPeopleClientsPCAServices
+tblDELETEDPeopleClientsPCAServicesContactNotes
+tblDELETEDPeopleClientsResidentialServices
+tblDELETEDPeopleClientsSharedLivingServices
+tblDELETEDPeopleClientsSpringboardServices
+tblDELETEDPeopleClientsTRASEServices
+tblDELETEDPeopleClientsTransportationServices
+tblDELETEDPeopleClientsVendors
+tblDELETEDPeopleClientsVocationalServices
+tblDELETEDPeopleConsultants
+tblDELETEDPeopleDonors
+tblDELETEDPeopleFamily
+tblDedhamHQLocations
+tblPeopleStaffSupervisorsBkup
+~TMPCLP306311
+~TMPCLP467621
+
+================================================================================
+3. catMassHealthServiceLevels IMPLEMENTATION SUMMARY
+================================================================================
+
+This section summarizes the implementation of the catMassHealthServiceLevels
+table in TILLDBWeb_Prod.
+
+TABLE STRUCTURE
+================================================================================
+
+Table Name: catMassHealthServiceLevels
+Schema: dbo
+
+Columns:
+  - MassHealthServiceLevel: NVARCHAR(25) NOT NULL
+    Primary Key: Yes
+
+RELATIONSHIP TO OTHER CHANGES
+================================================================================
+
+This table is related to the new fields being added:
+  - tblPeopleClientsDayServices.MassHealthServiceLevel
+  - tblPeopleDayAttendance.MassHealthServiceLevel
+
+The catMassHealthServiceLevels table serves as a lookup/reference table
+for these fields, ensuring data integrity and providing valid values for
+dropdown lists or validation.
+
+PROCEDURE CHANGES
+================================================================================
+
+Procedure: spApp_DataImportFromTILLDB_Cat
+
+Changes Made:
+  1. Added DELETE statement:
+     delete from dbo.[catMassHealthServiceLevels];
+     (Placed after catMonths DELETE, before catRaces DELETE)
+
+  2. Added INSERT statement:
+     insert into dbo.[catMassHealthServiceLevels]
+     (
+         [MassHealthServiceLevel]
+     )
+     select [MassHealthServiceLevel]
+     from ext.[catMassHealthServiceLevels];
+     (Placed after catMonths INSERT, before catRaces INSERT)
+
+EXECUTION STATUS
+================================================================================
+
+✅ Table creation script: Included in MASTER_UPDATE_SCRIPT.sql
+✅ Procedure update: Included in MASTER_UPDATE_SCRIPT.sql
+✅ Ready for execution: Yes (after review and testing)
+
+IMPORTANT NOTES
+================================================================================
+
+1. The table uses the external schema (ext) to reference TILLDB
+2. The procedure deletes all existing data before inserting new data
+3. The MassHealthServiceLevel column is the primary key
+4. All values come from TILLDB.dbo.catMassHealthServiceLevels
+5. Implementation is included in the MASTER_UPDATE_SCRIPT.sql file
+
+================================================================================
+4. IMPLEMENTATION SUMMARY
+================================================================================
+
+MASTER UPDATE SCRIPT
+================================================================================
+
+All changes have been consolidated into: sql/MASTER_UPDATE_SCRIPT.sql
+
+This script includes:
+  1. Adding new fields to existing tables (with IF NOT EXISTS checks)
+  2. Creating catMassHealthServiceLevels table
+  3. Updating spApp_DataImportFromTILLDB_Cat procedure
+  4. Updating spApp_DataImportFromTILLDB_People procedure
+
+⚠️ IMPORTANT: 
+  - Always test in a non-production environment first
+  - Backup the database before making changes
+  - Review all changes before executing
+
+AFFECTED STORED PROCEDURES
+================================================================================
+
+1. spApp_DataImportFromTILLDB_Cat
+   - Updated to include CityTown and Location fields for catStaffEmailAddresses
+   - Updated to populate catMassHealthServiceLevels table
+
+2. spApp_DataImportFromTILLDB_People
+   - Updated to include new fields for:
+     * tblPeopleClientsDayServices (LevelUpdatedWhen, LevelUpdatedWho, MassHealthServiceLevel)
+     * tblPeopleDayAttendance (MassHealthServiceLevel)
+     * tblPeopleScheduledStaffChanges (AddMidInitial, CurrentMidinitial, DeleteMidInitial, NewMidInitial)
+
+================================================================================
+END OF DOCUMENT
+================================================================================
+
